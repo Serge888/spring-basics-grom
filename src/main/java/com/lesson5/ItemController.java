@@ -35,8 +35,10 @@ public class ItemController {
     public @ResponseBody
     String updateItem(HttpServletRequest req) {
         try {
-//            Item item = itemDao.findById(mapItem(req).getId());
-            itemDao.updateItem(mapItem(req).getId());
+            Item itemNew = mapItem(req);
+            Item item = itemDao.findById(itemNew.getId());
+            item.setDescription(itemNew.getDescription());
+            itemDao.updateItem(item);
         } catch (Exception e) {
             return "update - fail";
         }
@@ -48,8 +50,7 @@ public class ItemController {
     public @ResponseBody
     String deleteItem(HttpServletRequest req) {
         try {
-            Item item = itemDao.findById(mapItem(req).getId());
-            itemDao.deleteItem(item);
+            itemDao.deleteItem(mapItem(req).getId());
         } catch (Exception e) {
             return "delete - fail";
         }

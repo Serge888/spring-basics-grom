@@ -18,14 +18,14 @@ public class ItemDao {
         return item;
     }
 
-    public Item updateItem(long id) {
-        Item item = entityManager.find(Item.class, id);
+    public Item updateItem(Item item) {
         entityManager.merge(item);
         return item;
     }
 
-    public Item deleteItem(Item item) {
-        entityManager.detach(item);
+    public Item deleteItem(Long id) {
+        Item item = entityManager.find(Item.class, id);
+        entityManager.remove(item);
         return item;
     }
 

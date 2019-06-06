@@ -1,9 +1,12 @@
 package com.lesson5;
 
+import lombok.EqualsAndHashCode;
+
 import javax.persistence.*;
 
 @Entity
 @Table(name = "ITEM")
+@EqualsAndHashCode
 public class Item {
     private Long id;
     private String description;
