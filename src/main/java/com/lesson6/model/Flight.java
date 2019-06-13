@@ -3,8 +3,7 @@ package com.lesson6.model;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Data
 @Entity
@@ -17,18 +16,18 @@ public class Flight {
     @Column(name = "ID")
     private Long id;
 
-    @ManyToOne (optional=false, fetch=FetchType.EAGER)
+    @ManyToOne (optional=false, fetch=FetchType.LAZY)
     @JoinColumn (name="PLANE_ID", nullable=false)
     private Plane plane;
 
-
-    @ManyToMany(cascade = { CascadeType.ALL })
+//    @Transient
+    @ManyToMany
     @JoinTable(
             name = "FLIGHT_PASSENGER",
-            joinColumns = { @JoinColumn(name = "FLIGHT_ID") },
-            inverseJoinColumns = { @JoinColumn(name = "PASSENGER_ID") }
+            joinColumns = { @JoinColumn(name = "FLIGHT_ID", referencedColumnName = "ID") },
+            inverseJoinColumns = { @JoinColumn(name = "PASSENGER_ID", referencedColumnName = "ID") }
     )
-    private List<Passenger> passengers;
+    private Set<Passenger> passengers = new HashSet<>();
 
 
     @Column(name = "DATE_FLIGHT")

@@ -43,7 +43,7 @@ public class FlightController {
         Flight flight = new Flight();
         try {
             Flight flightNew = mapFlight(req);
-            flight = flightService.findById(flight.getId());
+            flight = flightService.findById(flightNew.getId());
             flight.setPlane(flightNew.getPlane());
             flight.setDateFlight(flightNew.getDateFlight());
             flight.setCityFrom(flightNew.getCityFrom());
@@ -52,6 +52,7 @@ public class FlightController {
             flightService.update(flight);
         } catch (Exception e) {
             e.getMessage();
+            e.getCause();
             return "flight id " + flight.getId() + " was not updated";
         }
         return "flight id " + flight.getId() + " was updated";
