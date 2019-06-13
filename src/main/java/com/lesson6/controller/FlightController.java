@@ -2,7 +2,9 @@ package com.lesson6.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lesson6.model.Flight;
+import com.lesson6.model.Passenger;
 import com.lesson6.service.FlightService;
+import com.lesson6.service.PassengerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,15 +14,21 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 @Controller
 public class FlightController {
     private FlightService flightService;
+    private PassengerService passengerService;
 
     @Autowired
-    public FlightController(FlightService flightService) {
+    public FlightController(FlightService flightService, PassengerService passengerService) {
         this.flightService = flightService;
+        this.passengerService = passengerService;
     }
+
 
     @RequestMapping(method = RequestMethod.POST, value = "/save-flight", produces = "text/plain")
     public @ResponseBody
@@ -42,16 +50,14 @@ public class FlightController {
     String update(HttpServletRequest req) {
         Flight flight = new Flight();
         try {
-            Flight flightNew = mapFlight(req);
-            flight = flightService.findById(flightNew.getId());
-            flight.setPlane(flightNew.getPlane());
-            flight.setDateFlight(flightNew.getDateFlight());
-            flight.setCityFrom(flightNew.getCityFrom());
-            flight.setCityTo(flightNew.getCityTo());
-            flight.setPassengers(flightNew.getPassengers());
+            flight = mapFlight(req);
+            Set<Passenger> passengerSet = new HashSet<>();
+            for (Passenger passenger : flight.getPassengers()) {
+                passengerSet.add(passengerService.findById(passenger.getId()));
+            }
+            flight.setPassengers(passengerSet);
             flightService.update(flight);
         } catch (Exception e) {
-            e.getMessage();
             e.getCause();
             return "flight id " + flight.getId() + " was not updated";
         }

@@ -28,14 +28,13 @@ public class Passenger {
     @Column(name = "PASSPORT_CODE")
     private String passportCode;
 
-//    @Transient
-//    @ManyToMany
-//    @JoinTable(
-//        name = "FLIGHT_PASSENGER",
-//        joinColumns = { @JoinColumn(name = "PASSENGER_ID", referencedColumnName = "ID") },
-//        inverseJoinColumns = { @JoinColumn(name = "FLIGHT_ID", referencedColumnName = "ID") }
-//    )
-    @ManyToMany(mappedBy = "passengers")
+
+    @ManyToMany
+    @JoinTable(
+        name = "FLIGHT_PASSENGER",
+        joinColumns = { @JoinColumn(name = "PASSENGER_ID", referencedColumnName = "ID") },
+        inverseJoinColumns = { @JoinColumn(name = "FLIGHT_ID", referencedColumnName = "ID") }
+    )
     private Set<Flight> flights = new HashSet<>();
 
 }

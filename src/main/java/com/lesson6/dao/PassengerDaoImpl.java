@@ -15,6 +15,7 @@ public class PassengerDaoImpl implements PassengerDao {
     @PersistenceContext
     private EntityManager entityManager;
 
+
     @Override
     public Passenger save(Passenger passenger) {
         entityManager.persist(passenger);

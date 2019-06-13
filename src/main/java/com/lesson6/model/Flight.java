@@ -1,6 +1,8 @@
 package com.lesson6.model;
 
 import lombok.Data;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.util.*;
@@ -20,7 +22,7 @@ public class Flight {
     @JoinColumn (name="PLANE_ID", nullable=false)
     private Plane plane;
 
-//    @Transient
+
     @ManyToMany
     @JoinTable(
             name = "FLIGHT_PASSENGER",

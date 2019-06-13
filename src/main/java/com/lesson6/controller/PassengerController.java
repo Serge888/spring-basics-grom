@@ -78,6 +78,7 @@ public class PassengerController {
             passenger = mapPassenger(req);
             passenger = passengerService.findById(passenger.getId());
         } catch (IOException e) {
+            e.getCause();
             e.printStackTrace();
             return "passenger " + passenger.getId() +" was not found.";
         }
