@@ -29,6 +29,7 @@ public class Passenger {
     private String passportCode;
 
 
+    @Transient
     @ManyToMany
     @JoinTable(
         name = "FLIGHT_PASSENGER",

@@ -23,6 +23,7 @@ public class Flight {
     private Plane plane;
 
 
+    @Transient
     @ManyToMany
     @JoinTable(
             name = "FLIGHT_PASSENGER",
