@@ -14,9 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 @Controller
 public class FlightController {
@@ -45,13 +43,13 @@ public class FlightController {
     }
 
 
-    @RequestMapping(method = RequestMethod.POST, value = "/update-flight", produces = "text/plain")
+    @RequestMapping(method = RequestMethod.PUT, value = "/update-flight", produces = "text/plain")
     public @ResponseBody
     String update(HttpServletRequest req) {
         Flight flight = new Flight();
         try {
             flight = mapFlight(req);
-            Set<Passenger> passengerSet = new HashSet<>();
+            List<Passenger> passengerSet = new ArrayList<>();
             for (Passenger passenger : flight.getPassengers()) {
                 passengerSet.add(passengerService.findById(passenger.getId()));
             }
@@ -65,7 +63,7 @@ public class FlightController {
     }
 
 
-    @RequestMapping(method = RequestMethod.POST, value = "/delete-flight", produces = "text/plain")
+    @RequestMapping(method = RequestMethod.DELETE, value = "/delete-flight", produces = "text/plain")
     public @ResponseBody
     String delete(HttpServletRequest req) {
         Flight flight = new Flight();
@@ -79,12 +77,12 @@ public class FlightController {
         return "flight " + flight.getId() + " was deleted";
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/findById-flight", produces = "text/plain")
+    @RequestMapping(method = RequestMethod.GET, value = "/findById-flight", produces = "text/plain")
     public @ResponseBody
-    String findById(HttpServletRequest req) {
+    String findById(Long id) {
         Flight flight = new Flight();
         try {
-            flight = flightService.findById(mapFlight(req).getId());
+            flight = flightService.findById(id);
         } catch (Exception e) {
             e.getMessage();
             return "flight id " + flight.getId() +" was not found.";

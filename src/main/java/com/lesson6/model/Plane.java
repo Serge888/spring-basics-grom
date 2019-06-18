@@ -10,6 +10,7 @@ import java.util.Date;
 @Entity
 @Table(name = "PLANE")
 @EqualsAndHashCode
+@NamedQuery(name = "Plane.OldPlanes", query = "select p from Plane p where p.yearProduced < :date")
 public class Plane {
 
     @Id

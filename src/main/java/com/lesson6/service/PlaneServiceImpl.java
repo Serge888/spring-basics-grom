@@ -5,6 +5,8 @@ import com.lesson6.model.Plane;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class PlaneServiceImpl implements PlaneService {
 
@@ -33,5 +35,15 @@ public class PlaneServiceImpl implements PlaneService {
     public Plane findById(Long id) {
         return planeDao.findById(id);
 
+    }
+
+    @Override
+    public List<Plane> oldPlanes() {
+        return planeDao.oldPlanes();
+    }
+
+    @Override
+    public List<Plane> regularPlanes(int year) {
+        return planeDao.regularPlanes(year);
     }
 }

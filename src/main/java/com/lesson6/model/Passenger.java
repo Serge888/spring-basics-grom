@@ -1,8 +1,13 @@
 package com.lesson6.model;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
 import javax.persistence.*;
 import java.util.*;
 
+@ToString
+@EqualsAndHashCode
 @Entity
 @Table(name = "PASSENGER")
 public class Passenger {
@@ -11,7 +16,7 @@ public class Passenger {
     private String nationality;
     private Date dateOfBirth;
     private String passportCode;
-    private Set<Flight> flights = new HashSet<>();
+    private List<Flight> flights = new ArrayList<>();
 
 
     @Id
@@ -69,41 +74,11 @@ public class Passenger {
             joinColumns = { @JoinColumn(name = "PASSENGER_ID") },
             inverseJoinColumns = { @JoinColumn(name = "FLIGHT_ID") }
     )
-    public Set<Flight> getFlights() {
+    public List<Flight> getFlights() {
         return flights;
     }
 
-    public void setFlights(Set<Flight> flights) {
+    public void setFlights(List<Flight> flights) {
         this.flights = flights;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Passenger passenger = (Passenger) o;
-        return Objects.equals(id, passenger.id) &&
-                Objects.equals(lastName, passenger.lastName) &&
-                Objects.equals(nationality, passenger.nationality) &&
-                Objects.equals(dateOfBirth, passenger.dateOfBirth) &&
-                Objects.equals(passportCode, passenger.passportCode) &&
-                Objects.equals(flights, passenger.flights);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, lastName, nationality, dateOfBirth, passportCode, flights);
-    }
-
-    @Override
-    public String toString() {
-        return "Passenger{" +
-                "id=" + id +
-                ", lastName='" + lastName + '\'' +
-                ", nationality='" + nationality + '\'' +
-                ", dateOfBirth=" + dateOfBirth +
-                ", passportCode='" + passportCode + '\'' +
-                ", flights=" + flights +
-                '}';
     }
 }

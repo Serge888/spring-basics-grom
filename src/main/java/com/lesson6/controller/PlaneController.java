@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.List;
 
 @Controller
 public class PlaneController {
@@ -34,7 +35,7 @@ public class PlaneController {
     }
 
 
-    @RequestMapping(method = RequestMethod.POST, value = "/update-plane", produces = "text/plain")
+    @RequestMapping(method = RequestMethod.PUT, value = "/update-plane", produces = "text/plain")
     public @ResponseBody
     String update(HttpServletRequest req) {
         Plane plane = new Plane();
@@ -54,7 +55,7 @@ public class PlaneController {
     }
 
 
-    @RequestMapping(method = RequestMethod.POST, value = "/delete-plane", produces = "text/plain")
+    @RequestMapping(method = RequestMethod.DELETE, value = "/delete-plane", produces = "text/plain")
     public @ResponseBody
     String delete(HttpServletRequest req) {
         Plane plane = new Plane();
@@ -70,12 +71,12 @@ public class PlaneController {
 
 
 
-    @RequestMapping(method = RequestMethod.POST, value = "/findById-plane", produces = "text/plain")
+    @RequestMapping(method = RequestMethod.GET, value = "/findById-plane", produces = "text/plain")
     public @ResponseBody
-    String findById(HttpServletRequest req) {
+    String findById(Long id) {
         Plane plane = new Plane();
         try {
-            plane = planeService.findById(mapPlane(req).getId());
+            plane = planeService.findById(id);
         } catch (Exception e) {
             e.getMessage();
             return "plane " + plane.getId() +" was not found";
@@ -83,6 +84,20 @@ public class PlaneController {
         return "plane " + plane.getId() +" was found: " + plane;
     }
 
+    @RequestMapping(method = RequestMethod.GET, value = "/oldPlanes", produces = "text/plain")
+    public @ResponseBody
+    String oldPlanes() {
+        List<Plane> planeList = planeService.oldPlanes();
+        return "Planes that are older than 20 years : " + planeList.toString();
+    }
+
+
+    @RequestMapping(method = RequestMethod.GET, value = "/regularPlanes", produces = "text/plain")
+    public @ResponseBody
+    String regularPlanes(int year) {
+        List<Plane> planeList = planeService.regularPlanes(year);
+        return "Planes that have more than 300 flits per year : " + planeList.toString();
+    }
 
 
     private Plane mapPlane(HttpServletRequest req) throws IOException {
@@ -96,4 +111,5 @@ public class PlaneController {
         }
         return plane;
     }
+
 }

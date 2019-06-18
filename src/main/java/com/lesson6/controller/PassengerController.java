@@ -34,7 +34,7 @@ public class PassengerController {
     }
 
 
-    @RequestMapping(method = RequestMethod.POST, value = "/update-passenger", produces = "text/plain")
+    @RequestMapping(method = RequestMethod.PUT, value = "/update-passenger", produces = "text/plain")
     public @ResponseBody
     String update(HttpServletRequest req) {
         Passenger passenger = new Passenger();
@@ -55,7 +55,7 @@ public class PassengerController {
     }
 
 
-    @RequestMapping(method = RequestMethod.POST, value = "/delete-passenger", produces = "text/plain")
+    @RequestMapping(method = RequestMethod.DELETE, value = "/delete-passenger", produces = "text/plain")
     public @ResponseBody
     String delete(HttpServletRequest req) {
         Passenger passenger = new Passenger();
@@ -63,6 +63,7 @@ public class PassengerController {
             passenger = mapPassenger(req);
             passengerService.delete(passenger.getId());
         } catch (IOException e) {
+            e.getCause();
             e.printStackTrace();
             return "passenger id " + passenger.getId() + " was not deleted";
 
@@ -70,14 +71,13 @@ public class PassengerController {
         return "passenger id " + passenger.getId() + " was deleted " + passenger;
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/findById-passenger", produces = "text/plain")
+    @RequestMapping(method = RequestMethod.GET, value = "/findById-passenger", produces = "text/plain")
     public @ResponseBody
-    String findById(HttpServletRequest req) {
+    String findById(Long id) {
         Passenger passenger = new Passenger();
         try {
-            passenger = mapPassenger(req);
-            passenger = passengerService.findById(passenger.getId());
-        } catch (IOException e) {
+            passenger = passengerService.findById(id);
+        } catch (Exception e) {
             e.getCause();
             e.printStackTrace();
             return "passenger " + passenger.getId() +" was not found.";
@@ -91,6 +91,7 @@ public class PassengerController {
         try (ServletInputStream inputStream = req.getInputStream()) {
             passenger = objectMapper.readValue(inputStream, passenger.getClass());
         } catch (IOException e) {
+            e.getCause();
             e.printStackTrace();
             throw new IOException ("There some problem in mapPassenger method");
         }

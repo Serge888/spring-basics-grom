@@ -1,14 +1,19 @@
 package com.lesson6.model;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
 import javax.persistence.*;
 import java.util.*;
 
+@ToString(exclude = "passengers")
+@EqualsAndHashCode
 @Entity
 @Table(name = "FLIGHT")
 public class Flight {
     private Long id;
     private Plane plane;
-    private Set<Passenger> passengers = new HashSet<>();
+    private List<Passenger> passengers = new ArrayList<>();
     private Date dateFlight;
     private String cityFrom;
     private String cityTo;
@@ -43,11 +48,11 @@ public class Flight {
             joinColumns = { @JoinColumn(name = "FLIGHT_ID") },
             inverseJoinColumns = { @JoinColumn(name = "PASSENGER_ID") }
     )
-    public Set<Passenger> getPassengers() {
+    public List<Passenger> getPassengers() {
         return passengers;
     }
 
-    public void setPassengers(Set<Passenger> passengers) {
+    public void setPassengers(List<Passenger> passengers) {
         this.passengers = passengers;
     }
 
@@ -78,33 +83,4 @@ public class Flight {
         this.cityTo = cityTo;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Flight flight = (Flight) o;
-        return Objects.equals(id, flight.id) &&
-                Objects.equals(plane, flight.plane) &&
-                Objects.equals(passengers, flight.passengers) &&
-                Objects.equals(dateFlight, flight.dateFlight) &&
-                Objects.equals(cityFrom, flight.cityFrom) &&
-                Objects.equals(cityTo, flight.cityTo);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, plane, passengers, dateFlight, cityFrom, cityTo);
-    }
-
-    @Override
-    public String toString() {
-        return "Flight{" +
-                "id=" + id +
-                ", plane=" + plane +
-                ", passengers=" + passengers +
-                ", dateFlight=" + dateFlight +
-                ", cityFrom='" + cityFrom + '\'' +
-                ", cityTo='" + cityTo + '\'' +
-                '}';
-    }
 }
