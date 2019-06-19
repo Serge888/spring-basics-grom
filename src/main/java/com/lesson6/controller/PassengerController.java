@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.List;
 
 @Controller
 public class PassengerController {
@@ -85,6 +86,17 @@ public class PassengerController {
         return "passenger " + passenger.getId() +" was found: " + passenger;
     }
 
+
+    @RequestMapping(method = RequestMethod.GET, value = "/regularPassengers", produces = "text/plain")
+    public @ResponseBody
+    String regularPassengers(Integer year) {
+        List<Passenger> passengerList = passengerService.regularPassengers(year);
+        return "Passengers that have more than 25 flights per year: " + passengerList.toString();
+    }
+
+
+
+
     private Passenger mapPassenger(HttpServletRequest req) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         Passenger passenger = new Passenger();
@@ -97,4 +109,6 @@ public class PassengerController {
         }
         return passenger;
     }
+
+
 }

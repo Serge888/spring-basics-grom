@@ -1,6 +1,7 @@
 package com.lesson6.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lesson6.model.Filter;
 import com.lesson6.model.Flight;
 import com.lesson6.model.Passenger;
 import com.lesson6.service.FlightService;
@@ -91,6 +92,36 @@ public class FlightController {
         return "flight id " + flight.getId() +" was found: " + flight;
     }
 
+    @RequestMapping(method = RequestMethod.GET, value = "/mostPopularFrom", produces = "text/plain")
+    public @ResponseBody
+    String mostPopularFrom() {
+       List<Flight> flightList = flightService.mostPopularFrom();
+       return "The most popular flights according to departure cities: " + flightList.toString();
+    }
+
+
+    @RequestMapping(method = RequestMethod.GET, value = "/mostPopularTo", produces = "text/plain")
+    public @ResponseBody
+    String mostPopularTo() {
+       List<Flight> flightList = flightService.mostPopularTo();
+       return "The most popular flights according to arrival cities: " + flightList.toString();
+    }
+
+
+    @RequestMapping(method = RequestMethod.POST, value = "/flightsByFilter", produces = "text/plain")
+    public @ResponseBody
+    String flightsByDate(HttpServletRequest req) {
+        List<Flight> flightList = new ArrayList<>();
+        try {
+            Filter filter = mapFilter(req);
+            flightList.addAll(flightService.flightsByDate(filter));
+        } catch (IOException e) {
+            e.getMessage();
+            return "Flights according to the filter were not found.";
+        }
+        return "Flights according to the filter: " + flightList.toString();
+    }
+
 
     private Flight mapFlight(HttpServletRequest req) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -102,5 +133,17 @@ public class FlightController {
             throw new IOException ("There some problem in mapFlight method");
         }
         return flight;
+    }
+
+    private Filter mapFilter(HttpServletRequest req) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        Filter filter = new Filter();
+        try (ServletInputStream inputStream = req.getInputStream()) {
+            filter = objectMapper.readValue(inputStream, filter.getClass());
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new IOException ("There some problem in mapFilter method");
+        }
+        return filter;
     }
 }

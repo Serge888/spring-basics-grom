@@ -2,15 +2,15 @@ package com.lesson6.dao;
 
 import com.lesson6.model.Flight;
 import com.lesson6.model.Plane;
+import com.lesson6.util.DateUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.*;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.*;
 
 @Transactional
@@ -20,10 +20,16 @@ public class PlaneDaoImpl implements PlaneDao {
     private Integer yearsForOldPlanes;
     @Value("${flightsForRegularPlanes:300}")
     private Integer flightsForRegularPlanes;
-
+    private FlightDao flightDao;
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Autowired
+    public PlaneDaoImpl(FlightDao flightDao) {
+        this.flightDao = flightDao;
+    }
+
 
     @Override
     public Plane save(Plane plane) {
@@ -52,9 +58,8 @@ public class PlaneDaoImpl implements PlaneDao {
 
     @Override
     public List<Plane> oldPlanes() {
-
         LocalDate twentyYearsEarlier = LocalDate.now().minusYears(yearsForOldPlanes);
-        Date dateOld = Date.from(twentyYearsEarlier.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        Date dateOld = DateUtil.localDateToDate(twentyYearsEarlier);
         return entityManager.createNamedQuery("Plane.OldPlanes", Plane.class)
                 .setParameter("date", dateOld)
                 .getResultList();
@@ -63,14 +68,7 @@ public class PlaneDaoImpl implements PlaneDao {
 
     @Override
     public List<Plane> regularPlanes(int year) {
-        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Flight> criteriaQuery = builder.createQuery(Flight.class);
-        Root<Flight> flightRoot = criteriaQuery.from(Flight.class);
-        criteriaQuery.select(flightRoot);
-        Predicate predicate = builder.between(flightRoot.get("dateFlight"), begingOfYear(year), endOfYear(year));
-        criteriaQuery.where(predicate);
-        List<Flight> flightList = entityManager.createQuery(criteriaQuery).getResultList();
-
+        List<Flight> flightList = flightDao.flightsForYear(year);
         Map<Plane, Integer> planeMap = new HashMap<>();
         Plane plane;
         for (Flight flight : flightList) {
@@ -90,26 +88,4 @@ public class PlaneDaoImpl implements PlaneDao {
         return planeList;
     }
 
-
-    private Date begingOfYear(int year) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.YEAR, year);
-        calendar.set(Calendar.MONTH, 1);
-        calendar.set(Calendar.DAY_OF_MONTH, 1);
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        return calendar.getTime();
-    }
-
-    private Date endOfYear(int year) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.YEAR, year);
-        calendar.set(Calendar.MONTH, 12);
-        calendar.set(Calendar.DAY_OF_MONTH, 31);
-        calendar.set(Calendar.HOUR_OF_DAY, 23);
-        calendar.set(Calendar.MINUTE, 59);
-        calendar.set(Calendar.SECOND, 59);
-        return calendar.getTime();
-    }
 }

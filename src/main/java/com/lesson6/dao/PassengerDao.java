@@ -12,7 +12,7 @@ public interface PassengerDao {
     Passenger update(Passenger passenger);
     Passenger delete(Long id);
     Passenger findById(Long id);
-    List<Passenger> regularPassengers(int year);
+    List<Passenger> regularPassengers(Integer year);
 
 
 }

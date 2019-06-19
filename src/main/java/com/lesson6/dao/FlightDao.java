@@ -16,5 +16,6 @@ public interface FlightDao {
     List<Flight> flightsByDate(Filter filter);
     List<Flight> mostPopularTo();
     List<Flight> mostPopularFrom();
+    List<Flight> flightsForYear(int year);
 
 }

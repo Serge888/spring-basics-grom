@@ -5,6 +5,8 @@ import com.lesson6.model.Passenger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class PassengerServiceImpl implements PassengerService {
 
@@ -32,5 +34,10 @@ public class PassengerServiceImpl implements PassengerService {
     public Passenger findById(Long id) {
         return passengerDao.findById(id);
         
+    }
+
+    @Override
+    public List<Passenger> regularPassengers(Integer year) {
+        return passengerDao.regularPassengers(year);
     }
 }
