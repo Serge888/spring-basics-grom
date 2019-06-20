@@ -11,30 +11,25 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.*;
 import javax.transaction.Transactional;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Transactional
 @Repository
-public class FlightDaoImpl implements FlightDao {
+public class FlightDaoImpl extends GeneralDao<Flight> implements FlightDao {
     @Value("${mostPopular:10}")
     private Integer mostPopular;
 
-    @PersistenceContext
-    private EntityManager entityManager;
 
     @Override
     public Flight save(Flight flight) {
-        entityManager.persist(flight);
-        return flight;
+        return super.save(flight);
     }
 
     @Override
     public Flight update(Flight flight) {
-        entityManager.merge(flight);
-        return flight;
+        return super.update(flight);
     }
 
     @Override
@@ -122,18 +117,5 @@ public class FlightDaoImpl implements FlightDao {
                 .setMaxResults(mostPopular)
                 .getResultList();
     }
-
-
-    @Override
-    public List<Flight> flightsForYear(int year) {
-        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Flight> criteriaQuery = builder.createQuery(Flight.class);
-        Root<Flight> flightRoot = criteriaQuery.from(Flight.class);
-        criteriaQuery.select(flightRoot);
-        Predicate predicate = builder.between(flightRoot.get("dateFlight"), DateUtil.begingOfYear(year), DateUtil.endOfYear(year));
-        criteriaQuery.where(predicate);
-        return entityManager.createQuery(criteriaQuery).getResultList();
-    }
-
 
 }

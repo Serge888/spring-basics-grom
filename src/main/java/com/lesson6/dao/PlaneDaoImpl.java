@@ -1,46 +1,30 @@
 package com.lesson6.dao;
 
-import com.lesson6.model.Flight;
 import com.lesson6.model.Plane;
 import com.lesson6.util.DateUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.*;
 
 @Transactional
 @Repository
-public class PlaneDaoImpl implements PlaneDao {
+public class PlaneDaoImpl extends GeneralDao<Plane> implements PlaneDao {
     @Value("${yearsForOldPlanes:20}")
     private Integer yearsForOldPlanes;
     @Value("${flightsForRegularPlanes:300}")
     private Integer flightsForRegularPlanes;
-    private FlightDao flightDao;
-
-    @PersistenceContext
-    private EntityManager entityManager;
-
-    @Autowired
-    public PlaneDaoImpl(FlightDao flightDao) {
-        this.flightDao = flightDao;
-    }
-
 
     @Override
     public Plane save(Plane plane) {
-        entityManager.persist(plane);
-        return plane;
+        return super.save(plane);
     }
 
     @Override
     public Plane update(Plane plane) {
-        entityManager.merge(plane);
-        return plane;
+        return super.update(plane);
     }
 
     @Override
@@ -68,24 +52,17 @@ public class PlaneDaoImpl implements PlaneDao {
 
     @Override
     public List<Plane> regularPlanes(int year) {
-        List<Flight> flightList = flightDao.flightsForYear(year);
-        Map<Plane, Integer> planeMap = new HashMap<>();
-        Plane plane;
-        for (Flight flight : flightList) {
-            plane = flight.getPlane();
-            if (!planeMap.containsKey(plane)) {
-                planeMap.put(plane, 1);
-            } else {
-                planeMap.put(plane, planeMap.get(plane) + 1);
-            }
-        }
-        List<Plane> planeList = new ArrayList<>();
-        planeMap.forEach((k, v) -> {
-            if (v > flightsForRegularPlanes) {
-                planeList.add(k);
-            }
-        });
-        return planeList;
+        String sql = "WITH FLIGT_FOR_YEAR AS (SELECT PLANE_ID, COUNT(PLANE_ID) COUNTS FROM FLIGHT " +
+                "WHERE DATE_FLIGHT BETWEEN TO_DATE(:beginningOfYear) and TO_DATE(:endOfYear) " +
+                "GROUP BY PLANE_ID) " +
+                "SELECT * FROM PLANE " +
+                "JOIN FLIGT_FOR_YEAR ON  FLIGT_FOR_YEAR.PLANE_ID =  PLANE.ID " +
+                "WHERE COUNTS > :flightsForRegularPlanes";
+        return entityManager.createNativeQuery(sql, Plane.class)
+                .setParameter("beginningOfYear", DateUtil.getDateInStringBeginningOfYear(year))
+                .setParameter("endOfYear", DateUtil.getDateInStringEndOfYear(year))
+                .setParameter("flightsForRegularPlanes", flightsForRegularPlanes)
+                .getResultList();
     }
 
 }

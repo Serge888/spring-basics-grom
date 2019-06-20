@@ -1,5 +1,6 @@
 package com.lesson6.util;
 
+import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
@@ -15,25 +16,26 @@ public class DateUtil {
         return new java.sql.Date(date.getTime()).toLocalDate();
     }
 
-    public static Date begingOfYear(int year) {
+    public static Date beginningOfYear(int year) {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.YEAR, year);
-        calendar.set(Calendar.MONTH, 1);
-        calendar.set(Calendar.DAY_OF_MONTH, 1);
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
+        calendar.set(year, 0, 01 );
         return calendar.getTime();
     }
 
     public static Date endOfYear(int year) {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.YEAR, year);
-        calendar.set(Calendar.MONTH, 12);
-        calendar.set(Calendar.DAY_OF_MONTH, 31);
-        calendar.set(Calendar.HOUR_OF_DAY, 23);
-        calendar.set(Calendar.MINUTE, 59);
-        calendar.set(Calendar.SECOND, 59);
+        calendar.set(year, 11, 31 );
         return calendar.getTime();
+    }
+
+
+    public static String getDateInStringBeginningOfYear(int year) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+        return dateFormat.format(beginningOfYear(year));
+    }
+
+    public static String getDateInStringEndOfYear(int year) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+        return dateFormat.format(endOfYear(year));
     }
 }
