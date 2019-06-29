@@ -5,9 +5,7 @@ import com.lesson6.model.Plane;
 import com.lesson6.service.PlaneService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -22,10 +20,8 @@ public class PlaneController {
 
     @RequestMapping(method = RequestMethod.POST, value = "/save-plane", produces = "text/plain")
     public @ResponseBody
-    String save(HttpServletRequest req) {
-        Plane plane = new Plane();
+    String save(@RequestBody Plane plane) {
         try {
-            plane = mapPlane(req);
             planeService.save(plane);
         } catch (Exception e) {
             e.getMessage();
@@ -37,10 +33,9 @@ public class PlaneController {
 
     @RequestMapping(method = RequestMethod.PUT, value = "/update-plane", produces = "text/plain")
     public @ResponseBody
-    String update(HttpServletRequest req) {
+    String update(@RequestBody Plane planeNew) {
         Plane plane = new Plane();
         try {
-            Plane planeNew = mapPlane(req);
             plane = planeService.findById(planeNew.getId());
             plane.setModel(planeNew.getModel());
             plane.setCode(planeNew.getCode());
@@ -57,10 +52,8 @@ public class PlaneController {
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/delete-plane", produces = "text/plain")
     public @ResponseBody
-    String delete(HttpServletRequest req) {
-        Plane plane = new Plane();
+    String delete(@RequestBody Plane plane) {
         try {
-            plane = mapPlane(req);
             planeService.delete(plane.getId());
         } catch (Exception e) {
             e.getMessage();
@@ -71,12 +64,12 @@ public class PlaneController {
 
 
 
-    @RequestMapping(method = RequestMethod.GET, value = "/findById-plane", produces = "text/plain")
+    @RequestMapping(method = RequestMethod.GET, value = "/findById-plane/{planeId}", produces = "text/plain")
     public @ResponseBody
-    String findById(Long id) {
+    String findById(@PathVariable Long planeId) {
         Plane plane = new Plane();
         try {
-            plane = planeService.findById(id);
+            plane = planeService.findById(planeId);
         } catch (Exception e) {
             e.getMessage();
             return "plane " + plane.getId() +" was not found";
@@ -94,22 +87,9 @@ public class PlaneController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/regularPlanes", produces = "text/plain")
     public @ResponseBody
-    String regularPlanes(int year) {
+    String regularPlanes(@RequestParam int year) {
         List<Plane> planeList = planeService.regularPlanes(year);
         return "Planes that have more than 300 flits per year : " + planeList.toString();
-    }
-
-
-    private Plane mapPlane(HttpServletRequest req) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        Plane plane = new Plane();
-        try (ServletInputStream inputStream = req.getInputStream()) {
-            plane = objectMapper.readValue(inputStream, plane.getClass());
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new IOException ("There some problem in mapFlight method");
-        }
-        return plane;
     }
 
 }

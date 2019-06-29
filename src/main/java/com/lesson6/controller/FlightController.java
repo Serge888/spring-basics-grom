@@ -8,9 +8,7 @@ import com.lesson6.service.FlightService;
 import com.lesson6.service.PassengerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -31,10 +29,8 @@ public class FlightController {
 
     @RequestMapping(method = RequestMethod.POST, value = "/save-flight", produces = "text/plain")
     public @ResponseBody
-    String save(HttpServletRequest req) {
-        Flight flight = new Flight();
+    String save(@RequestBody Flight flight) {
         try {
-            flight = mapFlight(req);
             flightService.save(flight);
         } catch (Exception e) {
             e.getMessage();
@@ -46,10 +42,8 @@ public class FlightController {
 
     @RequestMapping(method = RequestMethod.PUT, value = "/update-flight", produces = "text/plain")
     public @ResponseBody
-    String update(HttpServletRequest req) {
-        Flight flight = new Flight();
+    String update(@RequestBody Flight flight) {
         try {
-            flight = mapFlight(req);
             List<Passenger> passengerSet = new ArrayList<>();
             for (Passenger passenger : flight.getPassengers()) {
                 passengerSet.add(passengerService.findById(passenger.getId()));
@@ -66,24 +60,22 @@ public class FlightController {
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/delete-flight", produces = "text/plain")
     public @ResponseBody
-    String delete(HttpServletRequest req) {
-        Flight flight = new Flight();
+    String delete(@RequestBody Flight flight) {
         try {
-            flight = mapFlight(req);
             flightService.delete(flight.getId());
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return "flight " + flight.getId() + " was not deleted";
         }
         return "flight " + flight.getId() + " was deleted";
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/findById-flight", produces = "text/plain")
+    @RequestMapping(method = RequestMethod.GET, value = "/findById-flight/{flightId}", produces = "text/plain")
     public @ResponseBody
-    String findById(Long id) {
+    String findById(@PathVariable Long flightId) {
         Flight flight = new Flight();
         try {
-            flight = flightService.findById(id);
+            flight = flightService.findById(flightId);
         } catch (Exception e) {
             e.getMessage();
             return "flight id " + flight.getId() +" was not found.";
@@ -110,40 +102,15 @@ public class FlightController {
 
     @RequestMapping(method = RequestMethod.POST, value = "/flightsByFilter", produces = "text/plain")
     public @ResponseBody
-    String flightsByDate(HttpServletRequest req) {
-        List<Flight> flightList = new ArrayList<>();
+    String flightsByDate(@RequestBody Filter filter) {
+        List<Flight> flightList;
         try {
-            Filter filter = mapFilter(req);
-            flightList.addAll(flightService.flightsByDate(filter));
-        } catch (IOException e) {
+            flightList = new ArrayList<>(flightService.flightsByDate(filter));
+        } catch (Exception e) {
             e.getMessage();
             return "Flights according to the filter were not found.";
         }
         return "Flights according to the filter: " + flightList.toString();
     }
 
-
-    private Flight mapFlight(HttpServletRequest req) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        Flight flight = new Flight();
-        try (ServletInputStream inputStream = req.getInputStream()) {
-            flight = objectMapper.readValue(inputStream, flight.getClass());
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new IOException ("There some problem in mapFlight method");
-        }
-        return flight;
-    }
-
-    private Filter mapFilter(HttpServletRequest req) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        Filter filter = new Filter();
-        try (ServletInputStream inputStream = req.getInputStream()) {
-            filter = objectMapper.readValue(inputStream, filter.getClass());
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new IOException ("There some problem in mapFilter method");
-        }
-        return filter;
-    }
 }

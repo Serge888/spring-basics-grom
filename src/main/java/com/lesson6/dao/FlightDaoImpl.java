@@ -7,8 +7,6 @@ import com.lesson6.util.DateUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.*;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
@@ -117,5 +115,7 @@ public class FlightDaoImpl extends GeneralDao<Flight> implements FlightDao {
                 .setMaxResults(mostPopular)
                 .getResultList();
     }
+
+
 
 }

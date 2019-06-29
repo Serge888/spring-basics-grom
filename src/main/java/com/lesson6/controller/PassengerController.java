@@ -5,9 +5,7 @@ import com.lesson6.model.Passenger;
 import com.lesson6.service.PassengerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -22,10 +20,8 @@ public class PassengerController {
 
     @RequestMapping(method = RequestMethod.POST, value = "/save-passenger", produces = "text/plain")
     public @ResponseBody
-    String save(HttpServletRequest req) {
-        Passenger passenger = new Passenger();
+    String save(@RequestBody Passenger passenger) {
         try {
-            passenger = mapPassenger(req);
             passengerService.save(passenger);
         } catch (Exception e) {
             e.getMessage();
@@ -37,10 +33,9 @@ public class PassengerController {
 
     @RequestMapping(method = RequestMethod.PUT, value = "/update-passenger", produces = "text/plain")
     public @ResponseBody
-    String update(HttpServletRequest req) {
+    String update(@RequestBody Passenger newPassenger) {
         Passenger passenger = new Passenger();
         try {
-            Passenger newPassenger = mapPassenger(req);
             passenger = passengerService.findById(newPassenger.getId());
             passenger.setLastName(newPassenger.getLastName());
             passenger.setNationality(newPassenger.getNationality());
@@ -58,12 +53,10 @@ public class PassengerController {
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/delete-passenger", produces = "text/plain")
     public @ResponseBody
-    String delete(HttpServletRequest req) {
-        Passenger passenger = new Passenger();
+    String delete(@RequestBody Passenger passenger) {
         try {
-            passenger = mapPassenger(req);
             passengerService.delete(passenger.getId());
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.getCause();
             e.printStackTrace();
             return "passenger id " + passenger.getId() + " was not deleted";
@@ -72,12 +65,12 @@ public class PassengerController {
         return "passenger id " + passenger.getId() + " was deleted " + passenger;
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/findById-passenger", produces = "text/plain")
+    @RequestMapping(method = RequestMethod.GET, value = "/findById-passenger/{passengerId}", produces = "text/plain")
     public @ResponseBody
-    String findById(Long id) {
+    String findById(@PathVariable Long passengerId) {
         Passenger passenger = new Passenger();
         try {
-            passenger = passengerService.findById(id);
+            passenger = passengerService.findById(passengerId);
         } catch (Exception e) {
             e.getCause();
             e.printStackTrace();
@@ -89,26 +82,9 @@ public class PassengerController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/regularPassengers", produces = "text/plain")
     public @ResponseBody
-    String regularPassengers(Integer year) {
+    String regularPassengers(@RequestParam Integer year) {
         List<Passenger> passengerList = passengerService.regularPassengers(year);
         return "Passengers that have more than 25 flights per year: " + passengerList.toString();
     }
-
-
-
-
-    private Passenger mapPassenger(HttpServletRequest req) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        Passenger passenger = new Passenger();
-        try (ServletInputStream inputStream = req.getInputStream()) {
-            passenger = objectMapper.readValue(inputStream, passenger.getClass());
-        } catch (IOException e) {
-            e.getCause();
-            e.printStackTrace();
-            throw new IOException ("There some problem in mapPassenger method");
-        }
-        return passenger;
-    }
-
 
 }
